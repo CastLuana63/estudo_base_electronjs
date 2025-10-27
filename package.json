@@ -1,0 +1,17 @@
+{
+  "name": "estudo_base_electronjs",
+  "productName": "Estudo dos Conceitos Electron Js",
+  "version": "1.0.0",
+  "description": "Projeto de estudos com Eletron js, explorando os conceitos gerais e principais do Eletron js como aplicação Desktop.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^38.4.0"
+  }
+}
