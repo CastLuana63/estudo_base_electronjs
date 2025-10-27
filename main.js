@@ -7,8 +7,8 @@ const createWindow = () => {
         height: 600,
         webPreferences: {
             preload: path.join(process.cwd(), 'preload.js'),
-            nodeIntegration: false,
             contextIsolation: true, // Config obrigatória para contextBridge
+            nodeIntegration: true, // Usar como False é mais recomendado (Por segurança), mas para teste pode usar como True
         }
     })
 
