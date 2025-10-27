@@ -1,57 +1,253 @@
 # estudo_base_electronjs
-Projeto de estudos com Eletron js, explorando os conceitos gerais e principais do Eletron js como aplicação Desktop.
 
-# Fonte de estudo e pesquisa
-- Leitura da documentação original
-``` https://www.electronjs.org/pt/docs/latest/tutorial/examples ```
+Projeto de estudos com Electron.js, explorando os conceitos gerais e principais do **Electron.js** como aplicação Desktop.
 
-- Vídeos no YouTube e Sites com artigos (Wiki..)
+---
 
-> ``` https://youtu.be/ML743nrkMHw?si=cKAvXkqOYWPR_8kL | Vídeo aula criando um projeto em Eletronjs com Javascript ```
+## Fonte de estudo e pesquisa
 
-> ``` https://blog.betrybe.com/framework-de-programacao/electron/ ```
+* Leitura da documentação original
 
-> ``` https://pt.wikipedia.org/wiki/Electron_(software) ```
+  ```
+  https://www.electronjs.org/pt/docs/latest/tutorial/examples
+  ```
 
-> ``` https://tableless.com.br/introducao-ao-electron/ ```
+* Vídeos no YouTube e Sites com artigos (Wiki, Blogs, etc.)
 
-> ``` https://terminalroot.com.br/2023/11/como-criar-um-mini-projeto-com-electronjs.html | Aplicação com gráficos ```
+> [Vídeo aula criando um projeto em Electron.js com Javascript](https://youtu.be/ML743nrkMHw?si=cKAvXkqOYWPR_8kL)
+
+> [Artigo sobre o framework Electron - Trybe](https://blog.betrybe.com/framework-de-programacao/electron/)
+
+> [Wikipedia - Electron (software)](https://pt.wikipedia.org/wiki/Electron_%28software%29)
+
+> [Introdução ao Electron - Tableless](https://tableless.com.br/introducao-ao-electron/)
+
+> [Como criar um mini projeto com ElectronJS (com gráficos)](https://terminalroot.com.br/2023/11/como-criar-um-mini-projeto-com-electronjs.html)
+
+---
+
+## Script e Configuração
+
+###  Passos para criar um projeto do zero
+
+* Comece com o comando inicial para gerar o `package.json`
+
+  ```bash
+  npm init
+  ```
+
+* Instale o Electron
+
+  ```bash
+  npm install electron --save-dev
+  ```
+
+  > O `--save-dev` é comum para ambientes de desenvolvimento, pois o Electron é usado apenas na execução local, não em produção web.
+
+* Crie a estrutura base do projeto:
+
+  ```
+  meu-projeto/
+  ├── package.json
+  ├── main.js
+  └── index.html
+  ```
+
+---
+
+### Caminho opcional para criar um projeto mais rápido
+
+* Esse comando é um atalho para criar um projeto completo, com estrutura pronta, empacotador, scripts e dependências configuradas:
+
+  ```bash
+  npx create-electron-app meu-projeto
+  ```
+
+  > Ideal para iniciar um projeto profissional sem configurar tudo manualmente.
+
+---
+
+## Código base para rodar o projeto
+
+#### No arquivo `main.js`
+
+```js
+import { app, BrowserWindow } from "electron";
+
+const criarJanela = () => {
+  const janela = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true, // permite usar Node.js no front-end
+      contextIsolation: false // caso precise para o desenvolvimento
+    }
+  });
+  janela.loadFile('index.html');
+};
+
+app.whenReady().then(() => {
+  criarJanela();
+});
+```
+- **Detalhe:**  `contextIsolation` é uma configuração isola o contexto de execução do site (renderer) do contexto interno do Electron (Node.js, IPC, etc.). Ele impede que scripts que rodam dentro da página (como o JavaScript do seu index.html ou scripts injetados de terceiros) tenham acesso direto aos recursos internos do Node.js ou do Electron.
+* Ao executar, abrirá uma janela automaticamente (em Windows, Linux e macOS).
+* O `app` controla o **ciclo de vida da aplicação**.
+* O `BrowserWindow` cria e gerencia as **janelas da aplicação desktop**.
+* O `BrowserWindow` só pode ser criado **após o evento `ready`** do `app` ser disparado — por isso usamos `app.whenReady().then()`.
+
+Execute no terminal `npm start` para rodar o projeto:
+```json
+"scripts": {
+  "start": "electron ."
+}
+```
+---
+
+### Encerrar a aplicação quando todas as janelas forem fechadas
+
+```js
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+```
+
+* O macOS mantém os apps abertos mesmo sem janelas, por isso o `if`.
+* `process.platform` retorna o sistema operacional atual (`win32`, `linux`, `darwin`...).
+
+---
+
+### Abrir uma janela se nenhuma estiver aberta (macOS)
+
+```js
+app.whenReady().then(() => {
+  criarJanela();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) criarJanela();
+  });
+});
+```
+
+---
+
+### Observações gerais
+
+* `app.on()` → Escuta eventos do ciclo de vida do aplicativo, como `ready`, `activate`, `window-all-closed`, etc.
+* `"activate"` → Evento disparado quando o usuário clica no ícone do app e não há janelas abertas (macOS).
+* Separação do código de front-end (`index.html`, `renderer.js`) do código principal (`main.js`).
+  O **processo principal** (`main.js`) controla janelas e sistema. Já o **processo de renderização** (`renderer.js`) lida com a interface e interações do usuário.
+* Electron junta o **Chromium + Node.js**, então é possível usar recursos do navegador **e** do Node ao mesmo tempo.
+* Caso o projeto use módulos ES (import/export), no `package.json` adicione:
+
+  ```json
+  {
+    "type": "module"
+  }
+  ```
+* **Por Segurança:** Evitar usar `nodeIntegration: true` em produção, pois isso permite execução de scripts maliciosos dentro do DOM.
+  Prefira comunicação segura via **IPC (Inter-Process Communication)**.
+
+  > **O que é IPC (Inter-Process Communication)?**
+  > 
+  > É o sistema que permite a comunicação entre o processo principal (´main´, que controla o app e tem acesso ao sistema) e os processos de renderização (`renderer`, que exibem a interface (HTML, CSS, JS))
+  >
+  > Ou seja, o meio pelo qual o front-end (renderer) envia e recebe mensagens do back-end (main) dentro do aplicativo Electron
+---
+
+## Termos e Funções Importantes
+
+| Termo / Função                  | Descrição                                                                                 |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `app`                           | Controla o ciclo de vida da aplicação Electron (inicialização, eventos, fechamento, etc.) |
+| `BrowserWindow`                 | Cria e gerencia janelas da aplicação, permitindo carregar arquivos HTML ou URLs.          |
+| `ipcMain`                       | Gerencia mensagens vindas do processo de renderização (`renderer`).                       |
+| `ipcRenderer`                   | Envia mensagens do front-end para o processo principal (`main`).                          |
+| `webContents`                   | Representa o conteúdo web renderizado dentro de uma `BrowserWindow`.                      |
+| `Tray`                          | Cria ícones e menus na bandeja do sistema (tray bar).                                     |
+| `Menu`                          | Cria menus personalizados na janela ou bandeja.                                           |
+| `shell`                         | Permite abrir links e arquivos externos no sistema operacional.                           |
+| `app.whenReady()`               | Retorna uma Promise resolvida quando o Electron terminou de inicializar.                  |
+| `app.on('activate')`            | Evento disparado quando o aplicativo é ativado (especialmente no macOS).                  |
+| `app.quit()`                    | Fecha a aplicação completamente.                                                          |
+| `BrowserWindow.getAllWindows()` | Retorna todas as janelas atualmente abertas.                                              |
+
+---
 
 
-# Script e config
-
-#### Passos para criar um projeto do zero
-- Comece com o comando inicial para gerar o `package.json`
-``` npm init ```
-- Instale o Electron
-``` npm install electron --save-dev || npm install electron ```
-- Crie a estrutura base do projeto
+## Estruturas mais comuns de pastas
 ```
 meu-projeto/
 ├── package.json
-├── main.js
-└── index.html
+├── main/                # Processo principal (controla janelas, menus, sistema)
+│   ├── main.js
+│   ├── preload.js       # Script que faz ponte entre o main e o renderer (segurança)
+│   ├── ipcHandlers.js   # Comunicação via IPC
+│   └── menu.js          # Criação de menus personalizados
+│
+├── renderer/            # Processo de renderização (interface e lógica de UI)
+│   ├── index.html
+│   ├── renderer.js
+│   ├── styles/
+│   │   └── style.css
+│   └── components/      # Componentes de interface (botões, janelas, modais, etc.)
+│
+├── assets/              # Imagens, ícones, fontes
+│   ├── icon.png
+│   └── logo.svg
+│
+└── build/               # Saída de build (quando empacotar com Electron Builder)
 ```
 
-#### Caminho opcional para criar um projeto mais rápido
-- Esse comando é um atalho para criar um projeto mais complexo, com estrutura, empacotador, template pronto, etc. 
-``` npx create-electron-app meu-projeto ```
 
+## Como o rederizador se comunica de forma segura com o processo principal?
+>  Entendendo o IPC (Inter-Process Communication)
 
-# Código para rodar o projeto base
+#### Arquivo de pré-carregamento (Preload Scrips)
 
-#### arquivo `main.js`
+- Arquivo é carregador no rederizador antes do html
+- Servem para expor apenas o que você quer para o código do renderizador, sem dar acesso total ao Node.js a forma mais segura.
+  
+> ##### Exemplo do código
 ```
-import { app, BrowserWindow } from "electron";
-const criarJanela = () => {
-    const janela = new BrowserWindow({
-        width: "100vw",
-        height: "100vh"
-    })
-    janela.loadFile('index.html')
-}
-app.whenReady().then(() => {
-    criarJanela()
+import { contextBridge } from "electron";
+
+contextBridge.exposeInMainWorld('versions', {
+    node:() => process.versions.node,
+    chrome:() => process.versions.chrome,
+    electron:() => process.versions.electron,
 })
 ```
-- 
+###### observações:
+- Usa o `contextBridge` para criar uma **variável global** chamada `versions` no renderizador.
+- Essa variável só permite que leia as versões do Node, Chrome e Electron.
+- Não dá **acesso completo ao Node.js**, o que é importante para segurança. 
+
+#### Usando o preload script no BrowserWindow
+Ao criar uma janela no Electron, conecta-se o preload
+
+
+```
+const mainWindow = new BrowserWindow({
+  width: 800,
+  height: 600,
+  webPreferences: {
+    preload: path.join(__dirname, 'preload.js')
+    // Caso use ES module como forma de importação de módulos, substitua o '__dirname' por 'process.cwd()'
+  }
+})
+```
+- `preload.js` é o script que vai rodar antes da página carregar.
+- Ele injeta a variável `versions` no window da sua página.
+
+> No HTML/JS pode-se colocar este trecho para teste.
+```
+console.log(window.versions.node())     // mostra a versão do Node
+console.log(window.versions.chrome())   // versão do Chrome
+console.log(window.versions.electron()) // versão do Electron
+```
+
+#### **Observações Gerais**
+
+- Não deve dar acesso total ao `Node.js` no renderizador por segurança.
+- O `preload script` permite criar um “meio-termo seguro”, onde expõe apenas o que quer do Node/Electron para o renderizador.

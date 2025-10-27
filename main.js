@@ -1,11 +1,32 @@
 import { app, BrowserWindow } from "electron";
-const criarJanela = () => {
-    const janela = new BrowserWindow({
-        width: "100vw",
-        height: "100vh"
+import path from "node:path";
+
+const createWindow = () => {
+    const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(process.cwd(), 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true, // Config obrigatória para contextBridge
+        }
     })
-    janela.loadFile('index.html')
+
+    win.loadFile('index.html')
 }
+
 app.whenReady().then(() => {
-    criarJanela()
+    createWindow()
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow()
+        }
+    })
+})
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
