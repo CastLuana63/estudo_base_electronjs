@@ -209,7 +209,7 @@ meu-projeto/
 - Servem para expor apenas o que você quer para o código do renderizador, sem dar acesso total ao Node.js a forma mais segura.
   
 > ##### Exemplo do código
-```
+```js
 import { contextBridge } from "electron";
 
 contextBridge.exposeInMainWorld('versions', {
@@ -227,7 +227,7 @@ contextBridge.exposeInMainWorld('versions', {
 Ao criar uma janela no Electron, conecta-se o preload
 
 
-```
+```js
 const mainWindow = new BrowserWindow({
   width: 800,
   height: 600,
