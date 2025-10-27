@@ -7,10 +7,7 @@ Projeto de estudos com Electron.js, explorando os conceitos gerais e principais 
 ## Fonte de estudo e pesquisa
 
 * Leitura da documentação original
-
-  ```
-  https://www.electronjs.org/pt/docs/latest/tutorial/examples
-  ```
+> [Documentação Original Electron js](https://www.electronjs.org/pt/docs/latest/tutorial/examples)
 
 * Vídeos no YouTube e Sites com artigos (Wiki, Blogs, etc.)
 
