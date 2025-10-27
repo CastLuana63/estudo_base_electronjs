@@ -248,3 +248,10 @@ console.log(window.versions.electron()) // versão do Electron
 
 - Não deve dar acesso total ao `Node.js` no renderizador por segurança.
 - O `preload script` permite criar um “meio-termo seguro”, onde expõe apenas o que quer do Node/Electron para o renderizador.
+
+## Tela da Aplicação
+![Conteudo exibido na aplicação](assets/image.png)
+
+
+## Comunicação entre processos (ipcMain -> ipcRenderer)
+O processo principal (main) e o renderizador (Renderer) têm responsabilidades distintas e não são intercambiáveis, ou seja, não épossível acessar as APIs do Node.js diretamente do processo de renderização, nem o HTML (DOM) do processo principal.
