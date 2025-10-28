@@ -204,7 +204,7 @@ meu-projeto/
 └── build/               # Saída de build (quando empacotar com Electron Builder)
 ```
 
-
+---
 ## Como o rederizador se comunica de forma segura com o processo principal?
 >  Entendendo o IPC (Inter-Process Communication)
 
@@ -260,7 +260,7 @@ console.log(window.versions.electron()) // versão do Electron
 ## Tela da Aplicação
 ![Conteudo exibido na aplicação](assets/image.png)
 
-
+---
 ## Comunicação entre processos (ipcMain -> ipcRenderer)
 O processo principal (main) e o renderizador (Renderer) têm responsabilidades distintas e não são intercambiáveis, ou seja, não épossível acessar as APIs do Node.js diretamente do processo de renderização, nem o HTML (DOM) do processo principal.
 
@@ -378,6 +378,7 @@ O resultado ({sucesso: true, mensagem: 'Produto cadastrado!'}) volta para o Reac
      ↑
 [ Renderer exibe resultado ]
 ```
+--- 
 
 ### Onde a Api entra?
 Há duas opções para encaixar a API no projeto.
@@ -398,3 +399,8 @@ Há duas opções para encaixar a API no projeto.
 - Isso burla o isolamento do Electron.
 - Caso o app precise funcionar offline, o Main pode lidar com cache e filas, mas Renderer não.
 
+
+
+## Mais detalhes sobre outros assuntos
+Acesse os Readmes 
+- [Estrutura de projetos mais comuns para o Main Process](aprofundando.md)
