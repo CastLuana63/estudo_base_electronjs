@@ -306,7 +306,6 @@ exibirTexto()
 
 A mensagem será exibida na janela da aplicação.
 
-
 ## Conclusões sobre a comunicação geral e IPC
 
 Como cada parte se comunica:
@@ -393,3 +392,9 @@ Há duas opções para encaixar a API no projeto.
   - Isso torna a aplicação mais pesado.
   - Para casos se quer que o app funcione totalmente offline.
   
+**Detalhes importante!**:
+> É possível fazer a requisição pelo React (Renderer), mas há pontos importante:
+- Fazer pela interface expõe URLs, tokens e possíveis dados sensível.
+- Isso burla o isolamento do Electron.
+- Caso o app precise funcionar offline, o Main pode lidar com cache e filas, mas Renderer não.
+
