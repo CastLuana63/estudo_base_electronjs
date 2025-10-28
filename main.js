@@ -8,7 +8,9 @@ const createWindow = () => {
         webPreferences: {
             preload: path.join(process.cwd(), 'preload.js'),
             nodeIntegration: false, // Usar como False é mais recomendado (Por segurança), mas para teste pode usar como True
-            contextIsolation: true // Config obrigatória para contextBridge
+            contextIsolation: true, // Config obrigatória para contextBridge
+            sandbox: false // Flag importante para ESM (modo de importação) evita erro de compatibilidade, 
+            // mas é mais seguro manter como true. Durante desenvolvimento não há problema em manter como false.
         }
     })
 

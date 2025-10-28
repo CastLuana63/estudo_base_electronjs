@@ -267,9 +267,9 @@ contextBridge.exposeInMainWorld('versions', {
 ```
 
 > **Observação Importante**
-
-    Segurança IPC:
-    - Não exponha todo o 'ipcRenderer' módulo via pré-carregamento para o código da interface. Em vez disso, exponha só funções específicas e controladas. Isso evita que códigos maliciosos dentro da UI mande qualquer mensagem ao processo principal.
+>
+> Segurança IPC:
+> - Não exponha todo o 'ipcRenderer' módulo via pré-carregamento para o código da interface. Em vez disso, exponha só funções específicas e controladas. Isso evita que códigos maliciosos dentro da UI mande qualquer mensagem ao processo principal.
   
 
 Após a configuração do `ipcRender` deve-se configurar o `handle` no processo principal (Main), faz isto antes carregando o arquivo html para que o manipulador esteja garantido antes de enviar o `invoke` da chamada do renderizaor. 
