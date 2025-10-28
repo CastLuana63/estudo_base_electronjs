@@ -1,15 +1,16 @@
-console.log(window.versions.node())
-console.log(window.versions.chrome())
-console.log(window.versions.electron())
+console.log(window.api.node());
+console.log(window.api.chrome());
+console.log(window.api.electron());
 
-const informacao = document.getElementById('info')
-informacao.innerText = `Este app usa a versão do Chrome (v${window.versions.chrome()}), 
-Node.js (v${window.versions.node()}), e Electron (v${window.versions.electron()})`
+const informacao = document.getElementById('info');
+informacao.innerText = `App usa Chrome (v${window.api.chrome()}), Node.js (v${window.api.node()}), Electron (v${window.api.electron()})`;
 
 const exibirTexto = async () => {
-    const response = await window.versions.ping()
-    console.log(response)
-    informacao.innerText = `Texto enviado pela Api/Main ${response}`
-}
+    const response = await window.api.ping();
+    console.log(response);
+    informacao.innerText = `Texto enviado pela API/Main: ${response}`;
+};
+exibirTexto();
 
-exibirTexto()
+const botao = document.getElementById('btnAbrirJanela');
+botao.addEventListener('click', () => window.api.abrirJanela('novaJanela'));

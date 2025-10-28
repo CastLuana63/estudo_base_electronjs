@@ -1,9 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld('versions', {
-    node: () => process.versions.node,
-    chrome: () => process.versions.chrome,
-    electron: () => process.versions.electron,
-    ping: () => ipcRenderer.invoke('ping')
-    // É possível expor variaveis também e não apenas funções
-})
+contextBridge.exposeInMainWorld('api', {
+  node: () => process.versions.node,
+  chrome: () => process.versions.chrome,
+  electron: () => process.versions.electron,
+  ping: () => ipcRenderer.invoke('ping'),
+  abrirJanela: (nome) => ipcRenderer.send('abrirJanela', nome)
+});
