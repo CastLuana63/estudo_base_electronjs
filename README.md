@@ -284,3 +284,16 @@ app.whenReady().then(() => {
 ```
 
 Depois de configurar o remetente e o destinatário, pode enviar mensagens do renderizador para o processo principal por meio do 'ping' canal que foi definido.
+
+```js
+const exibirTexto = async () => {
+    const response = await window.versions.ping()
+    console.log(response)
+    informacao.innerText = `Texto enviado pela Api/Main ${response}`
+}
+
+exibirTexto()
+
+```
+
+A mensagem será exibida na janela da aplicação.
