@@ -8,7 +8,7 @@ function novaJanela() {
     width: 600,
     height: 600,
     webPreferences: {
-      preload: path.join(process.cwd(), 'preload.js'),
+      preload: path.join(process.cwd(), 'preload2.js'),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
@@ -39,7 +39,7 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle('ping', () => 'pong');
+  ipcMain.handle('ping', () => 'teste');
   createWindow();
 
   ipcMain.on('abrirJanela', (event, nome) => {

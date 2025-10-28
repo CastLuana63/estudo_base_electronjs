@@ -57,7 +57,7 @@ Projeto de estudos com Electron.js, explorando os conceitos gerais e principais 
 * Esse comando é um atalho para criar um projeto completo, com estrutura pronta, empacotador, scripts e dependências configuradas:
 
   ```bash
-  npx create-electron-app meu-projeto
+    npx create-electron-app meu-projeto
   ```
 
   > Ideal para iniciar um projeto profissional sem configurar tudo manualmente.
@@ -399,6 +399,11 @@ Há duas opções para encaixar a API no projeto.
 - Isso burla o isolamento do Electron.
 - Caso o app precise funcionar offline, o Main pode lidar com cache e filas, mas Renderer não.
 
+## Ciclo de vida da aplicação com Electron
+O ciclo de vida é definido quando o app inicia, executa e encerra. No Electron ele é controlado pelo `Main process` através do módulo `app`.
+- O momento inicialização do ciclo é quando roda o `app.whenReady()`.
+- A execução é quando app está em uso e há interação com as funcionalidades do app.
+- O momento de encerramento é quando todas as janelas são fechadas o electron emite um evento. Há eventos que permitem interceptar o momento antes do app encerrar chamados `before-quit` e `will-quit`, eles podem salvar dados do usuário, fechar conexões com banco de dados e cancelar saídas indevidas.
 
 
 ## Mais detalhes sobre outros assuntos

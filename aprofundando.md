@@ -112,4 +112,3 @@ app.whenReady().then(() => {
   IpcHandlers.registerAll();
 });
 ```
-
