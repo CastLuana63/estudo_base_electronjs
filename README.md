@@ -175,24 +175,32 @@ app.whenReady().then(() => {
 ## Estruturas mais comuns de pastas
 ```
 meu-projeto/
-├── package.json
+├── api/                     # Opcional: sua API (pode ser local ou externa)
+│   ├── routes/
+│   └── server.js
+|
 ├── main/                # Processo principal (controla janelas, menus, sistema)
 │   ├── main.js
 │   ├── preload.js       # Script que faz ponte entre o main e o renderer (segurança)
 │   ├── ipcHandlers.js   # Comunicação via IPC
 │   └── menu.js          # Criação de menus personalizados
 │
-├── renderer/            # Processo de renderização (interface e lógica de UI)
+├── renderer(frontend)/            # Processo de renderização (interface e lógica de UI)
 │   ├── index.html
 │   ├── renderer.js
-│   ├── styles/
-│   │   └── style.css
-│   └── components/      # Componentes de interface (botões, janelas, modais, etc.)
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── index.jsx
+│   │   └── components/  # Componentes de interface (botões, janelas, modais, etc.)
+│   ├── public/
+│   └── package.json   
 │
-├── assets/              # Imagens, ícones, fontes
+├── assets/    
 │   ├── icon.png
 │   └── logo.svg
 │
+├── package.json
+|
 └── build/               # Saída de build (quando empacotar com Electron Builder)
 ```
 
@@ -262,7 +270,7 @@ A solução para essa comunicação entre processos (IPC), é usar elétrons `ip
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld('versions', {
-    ping: () => ipcRenderer.invoke('ping') // Função que retorna uma string
+    ping: () => ipcRenderer.invoke('ping') 
 })
 ```
 
@@ -297,3 +305,91 @@ exibirTexto()
 ```
 
 A mensagem será exibida na janela da aplicação.
+
+
+## Conclusões sobre a comunicação geral e IPC
+
+Como cada parte se comunica:
+
+🔹 1. Main Process (main.js)
+  - Roda em Node.js puro.
+  - Controla janelas (`BrowserWindow`), menus, arquivos, etc.
+  - NÃO acessa o DOM, nem React...
+  - Pode chamar APIs externas usando `fetch` ou `axios`.
+
+🔹 2. Renderer Process (React ou HTML)
+  - É a **interface** (React, HTML e CSS).
+  - NÃO tem acesso direto ao `fs`, `os`, etc. ( Isso por segurança).
+  - Pode pedir para o `Main Process` fazer algo via `IPC`.
+
+🔹 3. Preload (ponte segura)
+  - Fica entre o `Main` e o `Renderer`.
+  - Usa `contextBridge.exposeInMainWorld()` para expor funções seguras ao React.
+  
+#### Exemplo de um fluxo dessa comunicação (Cadastro de um produto)
+
+Para o frontend usa-se react como exemplo:
+```js
+function App() {
+  const enviarForm = async (e) => {
+    e.preventDefault();
+    const produto = { nome: "Caneta", preco: 2.50 };
+    const resultado = await window.electronAPI.cadastrarProduto(produto);
+    alert(resultado.mensagem);
+  };
+
+  return (
+    <form onSubmit={enviarForm}>
+      <input name="nome" placeholder="Nome" />
+      <input name="preco" placeholder="Preço" />
+      <button type="submit">Cadastrar Produto</button>
+    </form>
+  );
+}
+```
+- O react chama o preload ao executar `window.electronAPI.cadastrarProduto(produto)`, Isso envia os dados via IPC para o main.js.
+
+O `main` recebe esses dados via evento IPC e faz requisição na API
+
+```js
+import { app, BrowserWindow, ipcMain } from 'electron';
+import axios from 'axios';
+
+ipcMain.handle('cadastrar-produto', async (event, dados) => {
+  try {
+    const res = await axios.post('http://localhost:3000/api/produtos', dados);
+    return { sucesso: true, mensagem: 'Produto cadastrado!' };
+  } catch (erro) {
+    return { sucesso: false, mensagem: 'Erro ao cadastrar.' };
+  }
+});
+```
+O Main retorna a resposta da API de volta ao Renderer.
+O resultado ({sucesso: true, mensagem: 'Produto cadastrado!'}) volta para o React.
+
+> Em geral, resumo da comunicação:
+```
+[ React (Renderer) ]
+     ↓ (via preload)
+[ IPC → Main Process (Electron) ]
+     ↓ (HTTP request)
+[ API Express (localhost:3000) ]
+     ↑ (resposta JSON)
+[ Main envia de volta via IPC ]
+     ↑
+[ Renderer exibe resultado ]
+```
+
+### Onde a Api entra?
+Há duas opções para encaixar a API no projeto.
+
+🔹 1° já existe uma API rodando fora do Electron (como um backend Node.js/Express).
+  - O electron apenas consome a API
+  - O Main Process faz as requisições HTTP (axios ou fetch).
+  - A comunicação é feita pelo ipcMain ↔ ipcRenderer.
+  
+🔹 2° Uma API local (dentro do próprio Electron)
+  - Sobe um servidor Express dentro do main.js, caso quisser tudo embutido.
+  - Isso torna a aplicação mais pesado.
+  - Para casos se quer que o app funcione totalmente offline.
+  
