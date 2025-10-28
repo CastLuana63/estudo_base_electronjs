@@ -255,3 +255,32 @@ console.log(window.versions.electron()) // versão do Electron
 
 ## Comunicação entre processos (ipcMain -> ipcRenderer)
 O processo principal (main) e o renderizador (Renderer) têm responsabilidades distintas e não são intercambiáveis, ou seja, não épossível acessar as APIs do Node.js diretamente do processo de renderização, nem o HTML (DOM) do processo principal.
+
+A solução para essa comunicação entre processos (IPC), é usar elétrons `ipcMain` e `ipcRenderer`. Para enviar uma mensagem da sua página da web para o processo principal, pode configurar um manipulador de processo principal com `ipcMain.handle` e então exponha uma função que chama `ipcRenderer.invoke` para acionar o manipulador no script de `preload`.
+
+```js
+import { contextBridge, ipcRenderer } from "electron";
+
+contextBridge.exposeInMainWorld('versions', {
+    ping: () => ipcRenderer.invoke('ping') // Função que retorna uma string
+})
+```
+
+> **Observação Importante**
+
+    Segurança IPC:
+    - Não exponha todo o 'ipcRenderer' módulo via pré-carregamento para o código da interface. Em vez disso, exponha só funções específicas e controladas. Isso evita que códigos maliciosos dentro da UI mande qualquer mensagem ao processo principal.
+  
+
+Após a configuração do `ipcRender` deve-se configurar o `handle` no processo principal (Main), faz isto antes carregando o arquivo html para que o manipulador esteja garantido antes de enviar o `invoke` da chamada do renderizaor. 
+
+```js
+import { app, ipcMain } from "electron";
+
+app.whenReady().then(() => {
+  ipcMain.handle('ping', () => 'pong')
+  createWindow()
+})
+```
+
+Depois de configurar o remetente e o destinatário, pode enviar mensagens do renderizador para o processo principal por meio do 'ping' canal que foi definido.
